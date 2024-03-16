@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { AppModule } from './app.module';
+import { NestFactory } from "@nestjs/core";
+import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { AppModule } from "./app.module";
 
 // const targets: ITargetFile[] = [
 //   // {
@@ -25,10 +25,10 @@ async function bootstrap() {
   // const configService = app.get(ConfigService);
   // const rabbitUrl = configService.get('RABBIT_MQ_URI');
   const rabbitUrl =
-    'amqps://gncchebv:ajE60Bz7Ry9nc0O0lTYCulW2I64o9vFJ@gerbil.rmq.cloudamqp.com/gncchebv';
+    "amqps://gncchebv:ajE60Bz7Ry9nc0O0lTYCulW2I64o9vFJ@gerbil.rmq.cloudamqp.com/gncchebv";
 
   // const QUEUE = configService.get('RABBIT_MQ_SERVICE_QUEUE');
-  const QUEUE = 'main_queue';
+  const QUEUE = "main_queue";
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
@@ -42,8 +42,9 @@ async function bootstrap() {
     },
   });
 
-  app.startAllMicroservices().then(() => {
-    console.log('👌 Welcome to Trancoder service...`');
+  await app.startAllMicroservices().then(() => {
+    console.log("👌 Welcome to Trancoder service...`");
   });
+  // await app.listen(3000);
 }
 bootstrap();
