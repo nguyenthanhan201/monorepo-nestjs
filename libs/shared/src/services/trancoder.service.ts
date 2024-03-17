@@ -1,11 +1,14 @@
-import { IUploadResponse } from '@app/shared/interfaces/imageKit.interface';
-import { FirebaseService } from '@app/shared/services/firebase.service';
-import { UploadService } from '@app/shared/services/upload.service';
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import * as ffmpeg from 'fluent-ffmpeg';
-import * as fs from 'fs';
-import * as path from 'path';
+import { IUploadResponse } from "@app/shared/interfaces/imageKit.interface";
+import { FirebaseService } from "@app/shared/services/firebase.service";
+import { UploadService } from "@app/shared/services/upload.service";
+import * as ffmpegExecutable from "@ffmpeg-installer/ffmpeg";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { ClientProxy } from "@nestjs/microservices";
+import * as ffmpeg from "fluent-ffmpeg";
+import * as fs from "fs";
+import * as path from "path";
+
+ffmpeg.setFfmpegPath(ffmpegExecutable.path);
 
 export interface PlaylistVariant {
   resolution: string;
@@ -19,19 +22,19 @@ export interface Resolution {
 }
 const resolutions: Resolution[] = [
   {
-    resolution: '854x480',
-    videoBitrate: '1000k',
-    audioBitrate: '128k',
+    resolution: "854x480",
+    videoBitrate: "1000k",
+    audioBitrate: "128k",
   },
   {
-    resolution: '1280x720',
-    videoBitrate: '2500k',
-    audioBitrate: '192k',
+    resolution: "1280x720",
+    videoBitrate: "2500k",
+    audioBitrate: "192k",
   },
   {
-    resolution: '1920x1080',
-    videoBitrate: '5000k',
-    audioBitrate: '192k',
+    resolution: "1920x1080",
+    videoBitrate: "5000k",
+    audioBitrate: "192k",
   },
 ];
 
@@ -40,7 +43,7 @@ export class TrancoderService {
   constructor(
     private readonly firebaseService: FirebaseService,
     private readonly uploadService: UploadService,
-    @Inject('main_queue') private readonly uploadClient: ClientProxy,
+    @Inject("main_queue") private readonly uploadClient: ClientProxy
   ) {}
   async transcoderProcess({
     mp4FileName,
@@ -49,7 +52,8 @@ export class TrancoderService {
     mp4FileName: string;
     mp4Path: string;
   }): Promise<string> {
-    console.log('Starting script');
+    console.log("Starting script");
+    console.log("ffmpegExecutable.path", ffmpegExecutable.path);
 
     try {
       // const existsUrl = await this.checkIfFileExists(mp4FileName);
@@ -65,10 +69,10 @@ export class TrancoderService {
       const videoUrl = await this.upload();
 
       await this.deleteLocalVideo();
-      await this.deleteLocalUpload();
+      // await this.deleteLocalUpload();
       await this.deleteLocalDownloadVideo(mp4Path);
 
-      console.log('Success');
+      console.log("Success");
 
       return videoUrl;
     } catch (error) {
@@ -78,18 +82,18 @@ export class TrancoderService {
 
   async convert(
     mp4FileName: string,
-    mp4Path: string,
+    mp4Path: string
   ): Promise<PlaylistVariant[]> {
     const variantPlaylists: PlaylistVariant[] = [];
     for (const { resolution, videoBitrate, audioBitrate } of resolutions) {
       console.log(`HLS conversion starting for ${resolution}`);
       const outputFileName = `${mp4FileName.replace(
-        '.',
-        '_',
+        ".",
+        "_"
       )}_${resolution}.m3u8`;
       const segmentFileName = `${mp4FileName.replace(
-        '.',
-        '_',
+        ".",
+        "_"
       )}_${resolution}_%03d.ts?alt=media`;
       await new Promise((resolve, reject) => {
         ffmpeg(mp4Path)
@@ -108,11 +112,11 @@ export class TrancoderService {
           // .on('start', function (commandLine) {
           //   console.log('Spawned Ffmpeg with command: ' + commandLine);
           // })
-          .on('end', (val: unknown) => resolve(val))
-          .on('progress', function (progress) {
-            console.log('Processing: ' + progress.percent + '% done');
-          })
-          .on('error', (err: any) => reject(err))
+          .on("end", (val: unknown) => resolve(val))
+          // .on("progress", function (progress) {
+          //   console.log("Processing: " + progress.percent + "% done");
+          // })
+          .on("error", (err: any) => reject(err))
           .run();
       });
       const variantPlaylist: PlaylistVariant = {
@@ -127,7 +131,7 @@ export class TrancoderService {
   }
   generateMasterPlaylist(
     variantPlaylists: PlaylistVariant[],
-    mp4FileName: string,
+    mp4FileName: string
   ): string {
     console.log(`HLS master m3u8 playlist generating`);
 
@@ -135,19 +139,19 @@ export class TrancoderService {
       .map((variantPlaylist: PlaylistVariant) => {
         const { resolution, outputFileName } = variantPlaylist;
         const bandwidth =
-          resolution === '320x180'
+          resolution === "320x180"
             ? 676800
-            : resolution === '854x480'
+            : resolution === "854x480"
               ? 1353600
               : 3230400;
         return `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${resolution}\n${outputFileName}?alt=media`;
       })
-      .join('\n');
+      .join("\n");
     masterPlaylist = `#EXTM3U\n` + masterPlaylist;
 
     const masterPlaylistFileName = `${mp4FileName.replace(
-      '.',
-      '_',
+      ".",
+      "_"
     )}_master.m3u8`;
     const masterPlaylistPath = `hls/${masterPlaylistFileName}`;
     fs.writeFileSync(masterPlaylistPath, masterPlaylist);
@@ -157,17 +161,17 @@ export class TrancoderService {
     return masterPlaylistFileName;
   }
   async upload(): Promise<string> {
-    const hlsFolder = path.resolve('hls');
+    const hlsFolder = path.resolve("hls");
     const storage = this.firebaseService.getStorageInstance();
     const bucket = storage.bucket();
-    let videoUrl = '';
+    let videoUrl = "";
     const listUrl = [];
 
     const files = fs.readdirSync(hlsFolder);
 
     await Promise.all(
       files.map(async (file) => {
-        const fileName = `${file}`.replace('?alt=media', '');
+        const fileName = `${file}`.replace("?alt=media", "");
         const fileUpload = bucket.file(fileName);
 
         // await fileUpload
@@ -191,14 +195,14 @@ export class TrancoderService {
         const stream = fileUpload.createWriteStream();
 
         return new Promise((resolve, reject) => {
-          stream.on('error', (err) => {
+          stream.on("error", (err) => {
             reject(err);
           });
 
-          stream.on('finish', () => {
+          stream.on("finish", () => {
             const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileName}?alt=media`;
 
-            if (file.includes('master.m3u8')) videoUrl = imageUrl;
+            if (file.includes("master.m3u8")) videoUrl = imageUrl;
 
             listUrl.push(imageUrl);
             resolve(imageUrl);
@@ -206,7 +210,7 @@ export class TrancoderService {
 
           stream.end(fileStream);
         });
-      }),
+      })
     );
 
     console.log(listUrl);
@@ -215,7 +219,7 @@ export class TrancoderService {
   }
 
   async uploadOriginalVideo(
-    file: Express.Multer.File,
+    file: Express.Multer.File
   ): Promise<IUploadResponse> {
     const uploadVideo = await this.uploadService.uploadFile(file);
 
@@ -228,14 +232,14 @@ export class TrancoderService {
 
       const urlTranscoder = this.uploadClient.send(
         {
-          cmd: 'transcoder',
+          cmd: "transcoder",
         },
         {
           fileId,
           url,
-        },
+        }
       );
-      console.log('👌  urlTranscoder:', urlTranscoder);
+      console.log("👌  urlTranscoder:", urlTranscoder);
 
       return urlTranscoder as any;
     } catch (error) {
@@ -243,8 +247,8 @@ export class TrancoderService {
     }
   }
   deleteLocalVideo = async (): Promise<void> => {
-    console.log('Deleting files in hls folder');
-    const directory = path.resolve('hls');
+    console.log("Deleting files in hls folder");
+    const directory = path.resolve("hls");
 
     fs.readdir(directory, (err, files) => {
       if (err) throw err;
@@ -255,11 +259,11 @@ export class TrancoderService {
         });
       }
     });
-    console.log('Deleted files in hls folder');
+    console.log("Deleted files in hls folder");
   };
   deleteLocalUpload = async (): Promise<void> => {
-    console.log('Deleting files in uploads folder');
-    const directory = path.resolve('uploads');
+    console.log("Deleting files in uploads folder");
+    const directory = path.resolve("uploads");
 
     fs.readdir(directory, (err, files) => {
       if (err) throw err;
@@ -270,15 +274,15 @@ export class TrancoderService {
         });
       }
     });
-    console.log('Deleted files in uploads folder');
+    console.log("Deleted files in uploads folder");
   };
   deleteLocalDownloadVideo = async (filePath: string): Promise<void> => {
-    console.log('Deleting  download video');
+    console.log("Deleting  download video");
     fs.unlink(path.resolve(filePath), (err) => {
       if (err)
         throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
     });
-    console.log('Deleted  download video');
+    console.log("Deleted  download video");
   };
 }
 

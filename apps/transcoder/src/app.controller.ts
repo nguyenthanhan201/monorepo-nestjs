@@ -1,9 +1,9 @@
-import { TrancoderService } from '@app/shared/services/trancoder.service';
-import { getRemoteFile } from '@app/shared/utils/file';
-import { Controller, Get } from '@nestjs/common';
-import { Ctx, MessagePattern, RmqContext } from '@nestjs/microservices';
-import * as path from 'path';
-import { AppService } from './app.service';
+import { TrancoderService } from "@app/shared/services/trancoder.service";
+import { getRemoteFile } from "@app/shared/utils/file";
+import { Controller, Get } from "@nestjs/common";
+import { Ctx, MessagePattern, RmqContext } from "@nestjs/microservices";
+import * as path from "path";
+import { AppService } from "./app.service";
 
 interface IMessage {
   pattern: {
@@ -20,7 +20,7 @@ interface IMessage {
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly trancoderService: TrancoderService,
+    private readonly trancoderService: TrancoderService
   ) {}
 
   @Get()
@@ -39,14 +39,14 @@ export class AppController {
   //   return data;
   // }
 
-  @MessagePattern({ cmd: 'transcoder' })
+  @MessagePattern({ cmd: "transcoder" })
   async transcoder(@Ctx() context: RmqContext) {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
     channel.ack(originalMessage);
 
     const formatMessage: IMessage = JSON.parse(
-      originalMessage.content.toString(),
+      originalMessage.content.toString()
     );
 
     const {

@@ -1,3 +1,4 @@
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { AppModule } from "./app.module";
@@ -22,13 +23,10 @@ import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // const configService = app.get(ConfigService);
-  // const rabbitUrl = configService.get('RABBIT_MQ_URI');
-  const rabbitUrl =
-    "amqps://gncchebv:ajE60Bz7Ry9nc0O0lTYCulW2I64o9vFJ@gerbil.rmq.cloudamqp.com/gncchebv";
+  const configService = app.get(ConfigService);
 
-  // const QUEUE = configService.get('RABBIT_MQ_SERVICE_QUEUE');
-  const QUEUE = "main_queue";
+  const rabbitUrl = configService.get("RABBIT_MQ_URI");
+  const QUEUE = configService.get("RABBIT_MQ_SERVICE_QUEUE");
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,

@@ -1,8 +1,4 @@
-# Documents
-
-https://github.com/Jon-Peppinck/messenger-api
-
-# Database Mysql
+## Database Mysql
 
 Your account number is: 884814
 
@@ -52,6 +48,9 @@ $ docker build -t <image-name> .
 # run docker image
 $ docker run -p 3000:3000 <image-name>
 
+# build docker image monorepo
+$ docker build -f apps/transcoder/Dockerfile -t transcoder:version1 .
+
 or
 
 # run docker-compose
@@ -89,8 +88,10 @@ http://localhost:8080/swagger
 http://localhost:8080/swagger-json
 ```
 
-## Docs
+## Documents
 
 - [Structure](https://medium.com/the-crowdlinker-chronicle/best-way-to-structure-your-directory-code-nestjs-a06c7a641401)
 - [ErrorCode](docs/error-code.js)
 - [Knowledge](docs/base-concept-of-nest.md)
+- [Account](docs/account.md)
+- [Reference-Project]
