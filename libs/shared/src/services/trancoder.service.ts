@@ -31,11 +31,11 @@ const resolutions: Resolution[] = [
     videoBitrate: "2500k",
     audioBitrate: "192k",
   },
-  {
-    resolution: "1920x1080",
-    videoBitrate: "5000k",
-    audioBitrate: "192k",
-  },
+  // {
+  //   resolution: "1920x1080",
+  //   videoBitrate: "5000k",
+  //   audioBitrate: "192k",
+  // },
 ];
 
 @Injectable()

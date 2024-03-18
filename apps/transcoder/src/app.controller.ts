@@ -56,6 +56,8 @@ export class AppController {
     const videoName = `${fileId}.mp4`;
     const pathVideo = path.resolve(videoName);
 
+    console.log("👌  pathVideo:", pathVideo);
+
     await getRemoteFile(`${fileId}.mp4`, url);
 
     const videoUrl = await this.trancoderService.transcoderProcess({

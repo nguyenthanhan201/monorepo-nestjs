@@ -1,9 +1,16 @@
 version: "3.8"
+
+networks:
+  app-tier:
+    driver: bridge
+
 services:
   transcoder:
-    build:
-      context: ./
-      dockerfile: ./apps/transcoder/Dockerfile
+    image: transcoder:version1
+    # build:
+    #   context: ./
+    #   dockerfile: ./apps/transcoder/Dockerfile
+    #   target: development
     env_file:
       - .env
     ports:
@@ -16,6 +23,9 @@ services:
       - .:/usr/src/app # any change to base folder should be reflected
       - /usr/src/app/node_modules
     # command: npm run start:dev transcoder # overrides CMD from dockerfile
+    # command: node dist/apps/transcoder/apps/transcoder/src/main # overrides CMD from dockerfile
+    networks:
+      - app-tier
 
   # api:
   #   build:

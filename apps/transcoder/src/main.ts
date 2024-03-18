@@ -26,7 +26,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const rabbitUrl = configService.get("RABBIT_MQ_URI");
+  console.log("👌  rabbitUrl:", rabbitUrl);
   const QUEUE = configService.get("RABBIT_MQ_SERVICE_QUEUE");
+  console.log("👌  QUEUE:", QUEUE);
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,

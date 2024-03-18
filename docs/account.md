@@ -23,3 +23,11 @@ Database user: sql6691460
 Database password: tQMTBA5Sec
 Port number: 3306
 ```
+
+# Onrender
+
+https://dashboard.render.com/
+
+# Cloudamqp
+
+https://gerbil.rmq.cloudamqp.com/#/queues
