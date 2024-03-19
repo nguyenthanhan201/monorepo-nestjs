@@ -30,16 +30,18 @@
 # # CMD ["npm", "run", "start:dev", "transcoder"]
 # CMD ["node", "dist/apps/transcoder/apps/transcoder/src/main"]
 
-FROM node:alpine
+FROM node
 
 WORKDIR /usr/src/app
 
 COPY package*.json .
 
-RUN npm install
+RUN npm cache clean --force && \
+    npm install -g npm@8.13.2 && \
+    npm install
 
 COPY . .
 
-# RUN npm run build
+RUN npm run build
 
-CMD ["npm", "run", "start:transcoder"]
+CMD ["node", "dist/apps/transcoder/apps/transcoder/src/main"]
