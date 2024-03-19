@@ -40,6 +40,6 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+# RUN npm run build
 
-CMD ["node", "dist/apps/transcoder/apps/transcoder/src/main"]
+CMD ["npm", "run", "start:transcoder"]
