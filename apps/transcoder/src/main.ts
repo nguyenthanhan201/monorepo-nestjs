@@ -58,6 +58,7 @@ async function bootstrap() {
       queueOptions: {
         durable: true,
       },
+      persistent: true,
     },
   });
 

@@ -30,7 +30,7 @@
 # # CMD ["npm", "run", "start:dev", "transcoder"]
 # CMD ["node", "dist/apps/transcoder/apps/transcoder/src/main"]
 
-FROM node
+FROM node:alpine
 
 WORKDIR /usr/src/app
 
