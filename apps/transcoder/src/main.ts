@@ -1,3 +1,4 @@
+import { Resolution } from "@app/shared/services/trancoder.service";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
@@ -20,6 +21,24 @@ import { AppModule } from "./app.module";
 //   //   url: 'https://ik.imagekit.io/ue5qe7gwv/products/movie_0uq50CYION.mp4?updatedAt=1710408102179',
 //   // },
 // ];
+
+const resolutions: Resolution[] = [
+  {
+    resolution: "854x480",
+    videoBitrate: "1000k",
+    audioBitrate: "128k",
+  },
+  {
+    resolution: "1280x720",
+    videoBitrate: "2500k",
+    audioBitrate: "192k",
+  },
+  // {
+  //   resolution: "1920x1080",
+  //   videoBitrate: "5000k",
+  //   audioBitrate: "192k",
+  // },
+];
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
