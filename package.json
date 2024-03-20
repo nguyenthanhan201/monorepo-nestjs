@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/apps/transcoder/apps/transcoder/src/main",
     "start:dev": "nest start --watch",
     "dev": "nest start transcoder --watch",
     "start:debug": "nest start --debug --watch",

@@ -65,7 +65,7 @@ async function bootstrap() {
   app.startAllMicroservices().then(() => {
     console.log("👌 Welcome to Trancoder service...`");
   });
-  await app.listen(3000).then(() => {
+  await app.listen(3000, () => {
     console.log("👌 Trancoder service listening port 3000...`");
   });
 }
