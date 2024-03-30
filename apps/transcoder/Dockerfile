@@ -30,7 +30,7 @@
 # # CMD ["npm", "run", "start:dev", "transcoder"]
 # CMD ["node", "dist/apps/transcoder/apps/transcoder/src/main"]
 
-FROM node
+FROM node:18.12.0
 
 WORKDIR /usr/src/app
 
@@ -42,6 +42,6 @@ RUN npm cache clean --force && \
 
 COPY . .
 
-RUN npm run build
+RUN npm run build:transcoder
 
 CMD ["node", "dist/apps/transcoder/apps/transcoder/src/main"]

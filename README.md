@@ -39,24 +39,6 @@ $ yarn dev
 $ yarn run start:prod
 ```
 
-# Run with docker
-
-```bash
-# build docker image
-$ docker build -t <image-name> .
-
-# run docker image
-$ docker run -p 3000:3000 <image-name>
-
-# build docker image monorepo
-$ docker build -f apps/transcoder/Dockerfile -t transcoder:version1 .
-
-or
-
-# run docker-compose
-$ docker-compose up
-```
-
 ## Generate
 
 ```bash
@@ -95,3 +77,5 @@ http://localhost:8080/swagger-json
 - [Knowledge](docs/base-concept-of-nest.md)
 - [Account](docs/account.md)
 - [Reference-Project]
+- [Advantage Vertial Architecture](https://github.dev/meysamhadeli/booking-microservices-nestjs)
+- [Clean Architecture With NestJS](https://github.dev/royib/clean-architecture-nestJS)
