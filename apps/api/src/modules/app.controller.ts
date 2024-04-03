@@ -11,7 +11,7 @@ export class AppController {
   @Get()
   getHello(@Req() request: Request): string {
     // console.log('👌  request:', request.cookies.token);
-    return "Hello World! 123123123";
+    return "Hello World!";
   }
 
   @Public()
