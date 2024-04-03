@@ -1,0 +1,25 @@
+name: Deploy API service CI
+on:
+  workflow_run:
+    workflows: ["Publish API Image CI"]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy
+        # Only run this step if the branch is main
+        if: github.ref == 'refs/heads/main'
+        # env:
+        #   deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl --request POST \
+          --url https://api.render.com/v1/services/srv-co3o4fn79t8c738q4okg/deploys \
+          --header 'accept: application/json' \
+          --header 'authorization: Bearer rnd_ZdYGEqDaqOXiOeAcvkDlsCy3RvZ1' \
+          --header 'content-type: application/json' \
+          --data '{"clearCache": "do_not_clear","imageUrl": "docker.io/thanhan201/api:latest"}'
