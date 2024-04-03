@@ -1,5 +1,4 @@
 name: Publish API Image CI
-
 on:
   push:
     branches: ["main"]
