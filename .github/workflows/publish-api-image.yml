@@ -1,11 +1,15 @@
 name: Publish API Image CI
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+    paths:
+      - "apps/api/**"
   pull_request:
-    branches: ["main"]
-  paths:
-    - "apps/app-shell/**"
+    branches:
+      - main
+    paths:
+      - "apps/api/**"
 
 jobs:
   build:
