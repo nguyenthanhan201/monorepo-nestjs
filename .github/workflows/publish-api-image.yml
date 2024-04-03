@@ -1,0 +1,22 @@
+name: Publish API Image CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  paths:
+    - "apps/app-shell/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build . --file apps/api/Dockerfile --tag thanhan201/api:latest
+      - name: Publish
+        run: |
+          docker login -u thanhan201 -p ${{ secrets.DOCKER_HUB_TOKEN }}
+          docker push thanhan201/api:latest

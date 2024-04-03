@@ -27,7 +27,7 @@ import { OrderModule } from "./order/order.module";
 import { ProductModule } from "./product/product.module";
 import { RatingModule } from "./rating/rating.module";
 import { ScrapperModule } from "./scrapper/scrapper.module";
-import { TrancoderModule } from "./trancoder/trancoder.module";
+// import { TrancoderModule } from "./trancoder/trancoder.module";
 import { UploadModule } from "./upload/upload.module";
 import { UserModule } from "./user/user.module";
 require("dotenv").config();
@@ -65,7 +65,6 @@ require("dotenv").config();
     NotificationModel,
     LiveStreamModule,
     // AddNewModule,
-    TrancoderModule,
   ],
   controllers: [AppController],
   providers: [
