@@ -30,6 +30,7 @@ import { ScrapperModule } from "./scrapper/scrapper.module";
 // import { TrancoderModule } from "./trancoder/trancoder.module";
 import { UploadModule } from "./upload/upload.module";
 import { UserModule } from "./user/user.module";
+import { BrandModule } from './brand/brand.module';
 require("dotenv").config();
 
 @Module({
@@ -64,6 +65,7 @@ require("dotenv").config();
     UploadModule,
     NotificationModel,
     LiveStreamModule,
+    BrandModule,
     // AddNewModule,
   ],
   controllers: [AppController],
