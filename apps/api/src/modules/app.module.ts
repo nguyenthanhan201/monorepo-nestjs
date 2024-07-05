@@ -2,10 +2,8 @@ import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
-import { MulterModule } from "@nestjs/platform-express";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import * as Joi from "joi";
-import * as multer from "multer";
 import { AuthModule } from "../authentication/auth.module";
 import { routesWithRedisMiddleware } from "../common/constants/getRedisCacheRouters";
 import { AuthGuard } from "../common/guards/auth.guard";
@@ -28,9 +26,10 @@ import { ProductModule } from "./product/product.module";
 import { RatingModule } from "./rating/rating.module";
 import { ScrapperModule } from "./scrapper/scrapper.module";
 // import { TrancoderModule } from "./trancoder/trancoder.module";
+import { PollModule } from "./blog/blog.module";
+import { BrandModule } from "./brand/brand.module";
 import { UploadModule } from "./upload/upload.module";
 import { UserModule } from "./user/user.module";
-import { BrandModule } from './brand/brand.module';
 require("dotenv").config();
 
 @Module({
@@ -43,10 +42,10 @@ require("dotenv").config();
       }),
       envFilePath: ".env",
     }),
-    MulterModule.register({
-      dest: "uploads/",
-      storage: multer.memoryStorage(),
-    }),
+    // MulterModule.register({
+    // dest: "./uploads",
+    // storage: multer.memoryStorage(),
+    // }),
     GlobalHttpModule,
     RedisModule,
     QueueModule,
@@ -66,6 +65,7 @@ require("dotenv").config();
     NotificationModel,
     LiveStreamModule,
     BrandModule,
+    PollModule,
     // AddNewModule,
   ],
   controllers: [AppController],

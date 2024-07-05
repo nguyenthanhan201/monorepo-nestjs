@@ -39,3 +39,6 @@ lerna-debug.log*
 uploads/*
 hls/*
 *.mp4
+
+# Environment
+.env
