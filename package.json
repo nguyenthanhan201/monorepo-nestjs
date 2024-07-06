@@ -8,15 +8,18 @@
   "scripts": {
     "build:api": "nest build api",
     "build:transcoder": "nest build transcoder",
+    "build:blog": "nest build blog",
     "build": "npm run build:api && npm run build:auth",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node start",
     "start:dev": "nest start --watch",
     "dev:api": "nest start api --watch",
     "dev:transcoder": "nest start transcoder --watch",
+    "dev:blog": "nest start blog --watch",
     "start:debug": "nest start --debug --watch",
     "start:transcoder": "node dist/apps/transcoder/apps/transcoder/src/main",
     "start:api": "node dist/apps/api/apps/api/src/main",
+    "start:blog": "node dist/apps/blog/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -103,7 +106,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -111,7 +114,10 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "./coverage",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/apps/"
+    ]
   }
 }

@@ -1,17 +1,16 @@
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { MongooseModule } from "@nestjs/mongoose";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Blog } from "../../modules/blog/blog.entity";
 
 @Module({
   imports: [
-    MongooseModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>("MONGODB_URI"),
-        autoCreate: true,
-        // connectionFactory: (connection) => {
-        //   connection.plugin(slug);
-        //   return connection;
-        // },
+        type: "postgres",
+        url: configService.get<string>("POSTGRES_URI"),
+        entities: [Blog],
+        synchronize: true,
       }),
       inject: [ConfigService],
     }),

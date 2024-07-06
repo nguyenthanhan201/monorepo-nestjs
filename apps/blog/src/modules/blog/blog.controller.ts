@@ -1,20 +1,15 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { Public } from "../../common/decorators/allow-unauthorize-request.decorator";
-import { Blog } from "./blog.entity";
 import { BlogService } from "./blog.service";
+import { BlogCreateDto } from "./dto/blogCreate.dto";
 
 @ApiTags("Blog")
-@Controller("blog")
-@Public()
+@Controller()
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Post()
-  createPoll(
-    @Body()
-    body: Blog
-  ) {
+  createPoll(@Body() body: BlogCreateDto) {
     return this.blogService.createBlog(body);
   }
 

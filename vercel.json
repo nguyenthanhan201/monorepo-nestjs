@@ -3,14 +3,14 @@
   "env": {},
   "builds": [
     {
-      "src": "dist/apps/api/apps/api/src/main.js",
+      "src": "dist/apps/blog/main.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/apps/api/apps/api/src/main.js",
+      "dest": "dist/apps/blog/main.js",
       "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       "continue": true,
       "headers": {

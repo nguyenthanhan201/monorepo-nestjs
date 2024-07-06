@@ -23,4 +23,4 @@ COPY . .
 
 RUN npm run build:api
 
-CMD ["node", "dist/apps/api/apps/api/src/main.js"]
+CMD ["node", "dist/apps/blog/main.js"]

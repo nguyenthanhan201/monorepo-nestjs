@@ -12,4 +12,4 @@ import { BlogService } from "./blog.service";
   providers: [BlogService],
   controllers: [BlogController],
 })
-export class PollModule {}
+export class BlogModule {}
