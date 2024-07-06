@@ -84,3 +84,8 @@ http://localhost:8080/swagger-json
 ## Jenkins
 
 https://bewildered-porter-production.up.railway.app/
+
+## Vercel
+
+api: dist/apps/api/apps/api/src/main.js
+blog: dist/apps/blog/main.js
