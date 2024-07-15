@@ -28,37 +28,31 @@ export class ProductService {
   }
 
   async getAllProducts(key: string): Promise<ProductCreateDto[]> {
-    let products: any = [];
-
     // products = await this.productProducer.cacheProductsToRedis(products);
-    products = await this.cacheManager.get(key);
-    console.log("👌  products:", products);
+    // products = await this.cacheManager.get(key);
 
     // if (key) await this.productProducer.cacheProductsToRedis(products);
 
-    if (!products) {
-      products = await this.productModel
-        .find(
-          {
-            deletedAt: null,
-            // _id: {
-            //   $gt: '63cc11a770aa10b29d2bc3c0',
-            // },
-          }
-          // null,
-          // {
-          //   sort: {
-          //     _id: 1,
-          //   },
-          //   skip: 0,
-          //   limit: 10,
+    const products = await this.productModel
+      .find(
+        {
+          deletedAt: null,
+          // _id: {
+          //   $gt: '63cc11a770aa10b29d2bc3c0',
           // },
-        )
-        .exec();
+        }
+        // null,
+        // {
+        //   sort: {
+        //     _id: 1,
+        //   },
+        //   skip: 0,
+        //   limit: 10,
+        // },
+      )
+      .lean();
 
-      this.cacheManager.set(key, products, 60 * 60 * 24 * 7); // 7 days
-    }
-
+    this.cacheManager.set(key, products, 60 * 60 * 24 * 7); // 7 days
     return products;
     // return this.httpService
     //   .get('https://jsonplaceholder.typicode.com/todos')
@@ -72,11 +66,11 @@ export class ProductService {
   }
 
   async getAllHideProducts(): Promise<Product[]> {
-    return this.productModel
+    return await this.productModel
       .find({
         deletedAt: { $ne: null },
       })
-      .exec();
+      .lean();
   }
 
   async isSlugExists(slug: string): Promise<boolean> {

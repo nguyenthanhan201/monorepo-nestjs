@@ -1,6 +1,8 @@
-import { HttpService } from "@nestjs/axios";
-import { HttpException, Injectable } from "@nestjs/common";
+import { BadRequestError } from "@app/shared/core/error.response";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { Cache } from "cache-manager";
 import { Model, Types } from "mongoose";
 import { Brand, BrandDocument } from "./brand.model";
 import { BrandCreateDto } from "./dto/brandCreate.dto";
@@ -10,7 +12,7 @@ export class BrandService {
   constructor(
     @InjectModel(Brand.name)
     private readonly brandModal: Model<BrandDocument>,
-    private httpService: HttpService
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
   getAllBrandsByUserId(userId: Types.ObjectId) {
@@ -25,7 +27,7 @@ export class BrandService {
       });
 
       if (isUserExist) {
-        throw new HttpException("User already created brand", 400);
+        throw new BadRequestError("User already created brand");
       }
 
       const newBrand = new this.brandModal(data);
@@ -33,7 +35,7 @@ export class BrandService {
       return newBrand.save();
     } catch (error) {
       console.log(error);
-      throw new HttpException(error, 400);
+      throw new BadRequestError(error.message);
     }
   }
 
@@ -45,8 +47,11 @@ export class BrandService {
     );
   }
 
-  async getAllBrands() {
-    return this.brandModal.find();
+  async getAllBrands(key: string) {
+    const brands = await this.brandModal.find().lean();
+
+    this.cacheManager.set(key, brands, 60 * 60 * 24 * 7); // 7 days
+    return brands;
   }
 
   async getOneBrand(brandId: string) {

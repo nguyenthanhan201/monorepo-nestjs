@@ -1,0 +1,4 @@
+- xử lí multer khi deploy trên vercel (bị lỗi 500 khi lưu ảnh ở source be, hiện tại đang tắt tính năng lưu ảnh ở source để chạy deploy)
+- tích hợp momo và payos
+- tạo api comment
+- deploy server lên aws

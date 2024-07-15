@@ -14,6 +14,10 @@ Port number: 3306
 
 PhpMyAdmin can be found here: https://www.phpmyadmin.co/
 
+## Todos
+
+- [Todos](./docs/todo.md)
+
 ## Requirements
 
 - [Node.js](https://nodejs.org/en/) = v18.12.0

@@ -13,7 +13,6 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
-import { diskStorage } from "multer";
 import { Public } from "../../common/decorators/allow-unauthorize-request.decorator";
 import { FileDeleteDto } from "./dto/fileDelete.dto";
 import { UploadService } from "./upload.service";
@@ -55,24 +54,24 @@ export class UploadController {
     return this.uploadService.deleteFile(fileId);
   }
 
-  @Post("image")
-  @UseInterceptors(
-    FileInterceptor("image", {
-      storage: diskStorage({
-        destination: "./uploads",
-        filename: (req, file, cb) => {
-          const filename = `${Date.now()}-${file.originalname}`;
-          cb(null, filename);
-        },
-      }),
-    })
-  )
-  async uploadImage(
-    @UploadedFile(new FileImgValidationPipe())
-    file: Express.Multer.File
-  ) {
-    return this.uploadService.uploadImage(file);
-  }
+  // @Post("image")
+  // @UseInterceptors(
+  //   FileInterceptor("image", {
+  //     storage: diskStorage({
+  //       destination: "./tmp",
+  //       filename: (req, file, cb) => {
+  //         const filename = `${Date.now()}-${file.originalname}`;
+  //         cb(null, filename);
+  //       },
+  //     }),
+  //   })
+  // )
+  // async uploadImage(
+  //   @UploadedFile(new FileImgValidationPipe())
+  //   file: Express.Multer.File
+  // ) {
+  //   return this.uploadService.uploadImage(file);
+  // }
 
   @Get("image/:filePath")
   async getImage(@Param("filePath") filePath: string, @Res() res: Response) {

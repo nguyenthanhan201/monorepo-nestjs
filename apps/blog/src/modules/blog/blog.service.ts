@@ -19,4 +19,10 @@ export class BlogService {
   async getAllBlogs(): Promise<Blog[]> {
     return this.blogRepository.find();
   }
+
+  async getDetailBlog(id: string): Promise<Blog> {
+    return this.blogRepository.findOne({
+      where: { id },
+    });
+  }
 }

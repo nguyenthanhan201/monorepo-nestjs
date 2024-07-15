@@ -27,6 +27,7 @@ import { RatingModule } from "./rating/rating.module";
 import { ScrapperModule } from "./scrapper/scrapper.module";
 // import { TrancoderModule } from "./trancoder/trancoder.module";
 import { BrandModule } from "./brand/brand.module";
+import { CommentModule } from "./commnet/comment.module";
 import { UploadModule } from "./upload/upload.module";
 import { UserModule } from "./user/user.module";
 require("dotenv").config();
@@ -64,6 +65,7 @@ require("dotenv").config();
     NotificationModel,
     LiveStreamModule,
     BrandModule,
+    CommentModule,
     // AddNewModule,
   ],
   controllers: [AppController],

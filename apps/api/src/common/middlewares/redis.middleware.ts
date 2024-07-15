@@ -1,3 +1,5 @@
+import { BadRequestError } from "@app/shared/core/error.response";
+import { SuccessResponse } from "@app/shared/core/success.response";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, NestMiddleware } from "@nestjs/common";
 import { Cache } from "cache-manager";
@@ -14,16 +16,15 @@ export class RedisMiddleware implements NestMiddleware {
       const cacheRedis = await this.cacheManager.get(key);
 
       if (cacheRedis) {
-        res.json({
-          fromCache: true,
-          data: cacheRedis,
-        });
+        new SuccessResponse({
+          message: `List ${key} from cache redis OK`,
+          metadata: cacheRedis,
+        }).send(res);
       } else {
         next();
       }
     } catch (err) {
-      console.log("err redis middleware", err);
-      return res.status(500).json({ error: err.message });
+      return new BadRequestError(err.message).send(res);
     }
   }
 }

@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import { SuccessResponse } from "@app/shared/core/success.response";
+import { Body, Controller, Get, Param, Post, Put, Res } from "@nestjs/common";
+import { Response } from "express";
 import { Public } from "../../common/decorators/allow-unauthorize-request.decorator";
 import { GetUser } from "../../common/decorators/get-user.decorator";
 import { convertToObjectIdMongodb } from "../../common/utils";
@@ -12,9 +14,12 @@ export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
   @Public()
-  @Get("getAllBrands")
-  getAllBrands() {
-    return this.brandService.getAllBrands();
+  @Get("getAllBrands/:key")
+  async getAllBrands(@Res() res: Response, @Param("key") key: string) {
+    new SuccessResponse({
+      message: "List product OK",
+      metadata: await this.brandService.getAllBrands(key),
+    }).send(res);
   }
 
   @Public()

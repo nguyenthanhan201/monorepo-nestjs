@@ -1,3 +1,4 @@
+import { SuccessResponse } from "@app/shared/core/success.response";
 import {
   Body,
   Controller,
@@ -39,8 +40,11 @@ export class AuthController {
   }
 
   @Get("profile")
-  async getProfile(@Request() req) {
-    return req.user;
+  async getProfile(@Res() res: Response, @Request() req) {
+    new SuccessResponse({
+      message: "Get profile OK",
+      metadata: req.user,
+    }).send(res);
   }
 
   @Public()

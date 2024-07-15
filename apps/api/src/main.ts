@@ -37,11 +37,11 @@ async function bootstrap() {
 
   app.setGlobalPrefix("api/v1");
 
-  app.enableCors({
-    origin: ["https://nginx-1-0-0.onrender.com", /localhost:\d{4}/],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials: true,
-  });
+  // app.enableCors({
+  //   origin: ["https://nginx-1-0-0.onrender.com", /localhost:\d{4}/],
+  //   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  //   credentials: true,
+  // });
 
   // app.use(rateLimit(optionsRateLimit));
 

@@ -1,9 +1,5 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-  Injectable,
-} from "@nestjs/common";
+import { AuthFailureError } from "@app/shared/core/error.response";
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
@@ -47,9 +43,9 @@ export class AuthGuard implements CanActivate {
     } catch (error) {
       console.log("👌  error:", error);
       if (error.name === "TokenExpiredError") {
-        throw new HttpException("EXPIRED_TOKEN", 401);
+        throw new AuthFailureError("EXPIRED_TOKEN");
       } else {
-        throw new HttpException("Token not found", 401);
+        throw new AuthFailureError("Token not found");
       }
     }
     return true;

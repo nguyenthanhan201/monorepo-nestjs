@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { AuthLoginDto } from "../../authentication/dto/authLogin.dto";
 import { EmailProducer } from "../../common/jobs/providers/email.job.producer";
 import { User, UserDocument } from "./user.model";
 
@@ -33,7 +32,7 @@ export class UserService {
     return undefined;
   }
 
-  async create(user: AuthLoginDto): Promise<User> {
+  async create(user: { email: string; name: string }): Promise<User> {
     const newUser = new this.userModel(user);
 
     try {

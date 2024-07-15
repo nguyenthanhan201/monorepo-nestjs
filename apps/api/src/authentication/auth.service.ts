@@ -1,9 +1,16 @@
+import { AuthFailureError, ServerError } from "@app/shared/core/error.response";
+import { FirebaseService } from "@app/shared/services/firebase.service";
+import { supabaseService } from "@app/shared/services/supabase.service";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { HttpException, Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ClientProxy } from "@nestjs/microservices";
 import { Cache } from "cache-manager";
+import {
+  JWT_ACCESS_TOKEN_EXPIRED,
+  JWT_REFRESH_TOKEN_EXPIRED,
+} from "../common/constants";
 import { EmailService } from "../modules/email/email.service";
 import { User } from "../modules/user/user.model";
 import { UserService } from "../modules/user/user.service";
@@ -18,7 +25,8 @@ export class AuthService {
     private readonly emailService: EmailService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
 
-    @Inject("main_queue") private readonly authClient: ClientProxy
+    @Inject("main_queue") private readonly authClient: ClientProxy,
+    private readonly firebaseService: FirebaseService
   ) {}
 
   async sendMail() {
@@ -29,21 +37,65 @@ export class AuthService {
     return this.userService.getUserByEmail(email);
   }
 
-  async signIn(userData: AuthLoginDto) {
-    let user = await this.userService.findOne(userData.email);
+  async signIn({ providerToken, providerType }: AuthLoginDto) {
+    let authUser: { email: string; name: string };
+
+    switch (providerType) {
+      case "firebase":
+        const { email, name } = await this.firebaseService
+          .auth()
+          .verifyIdToken(providerToken)
+          .then((decodedToken) => decodedToken)
+          .catch((error) => {
+            console.log("👌  error:", error);
+            throw new AuthFailureError("Token invalid");
+          });
+
+        authUser = {
+          email,
+          name,
+        };
+        break;
+      case "supabase":
+        const {
+          data: { user },
+        } = await supabaseService.auth.getUser(providerToken);
+
+        authUser = {
+          email: user.email,
+          name: "test",
+        };
+        break;
+      default:
+        throw new AuthFailureError("Provider not found");
+    }
+
+    const { email, name } = authUser;
+
+    let user = await this.userService.findOne(email);
     // console.log('👌  user:', user);
 
     if (!user) {
-      user = await this.userService.create(userData).then((res) => {
-        return res;
-      });
+      user = await this.userService
+        .create({
+          email,
+          name,
+        })
+        .then((res) => {
+          return res;
+        });
     }
 
     const payload = { ...user, refeshToken: "" };
 
-    const access_token = await this.generateToken(payload, "1d");
-    // const access_token = await this.generateToken(payload, "10s");
-    const refresh_token = await this.generateToken(payload, "7d");
+    const access_token = await this.generateToken(
+      payload,
+      JWT_ACCESS_TOKEN_EXPIRED
+    );
+    const refresh_token = await this.generateToken(
+      payload,
+      JWT_REFRESH_TOKEN_EXPIRED
+    );
 
     return {
       access_token,
@@ -55,20 +107,21 @@ export class AuthService {
   async generateToken(user: User, expiresIn: string) {
     return await this.jwtService.signAsync(user, {
       expiresIn,
+      secret: this.configService.get("JWT_SECRET"),
     });
   }
 
   async verifyToken(token: string) {
     try {
       if (await this.cacheManager.get(token)) {
-        throw new HttpException("Token revoked", 401);
+        throw new AuthFailureError("Token revoked");
       }
 
       return await this.jwtService.verifyAsync(token, {
         secret: this.configService.get("JWT_SECRET"),
       });
     } catch (error) {
-      throw new HttpException(error, 500);
+      throw new ServerError(error);
     }
   }
 
@@ -81,7 +134,7 @@ export class AuthService {
         email: payload.email,
         name: payload.name,
       },
-      "1d"
+      JWT_ACCESS_TOKEN_EXPIRED
     );
     // response.cookie('Authentication', access_token, {
     //   httpOnly: true,

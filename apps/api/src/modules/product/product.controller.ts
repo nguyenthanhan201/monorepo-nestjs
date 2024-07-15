@@ -1,3 +1,4 @@
+import { SuccessResponse } from "@app/shared/core/success.response";
 import {
   Body,
   Controller,
@@ -6,11 +7,11 @@ import {
   Param,
   Post,
   Put,
+  Res,
 } from "@nestjs/common";
 import { ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
 import { Public } from "../../common/decorators/allow-unauthorize-request.decorator";
-import { GetUser } from "../../common/decorators/get-user.decorator";
-import { User } from "../user/user.model";
 import { ProductCreateDto } from "./dto/productCreate.dto";
 import { ProductService } from "./product.service";
 
@@ -28,15 +29,20 @@ export class ProductController {
     description: "Search product in elastic search",
   })
   @ApiResponse({ status: 403, description: "Forbidden." })
-  async getAllProducts(@Param("key") key: string) {
-    return this.productService.getAllProducts(key);
+  async getAllProducts(@Res() res: Response, @Param("key") key: string) {
+    new SuccessResponse({
+      message: "List product OK",
+      metadata: await this.productService.getAllProducts(key),
+    }).send(res);
   }
 
   // @UseGuards(JwtAuthGuard)
   @Get("hide")
-  getAllHideProducts(@GetUser() user: User) {
-    // console.log(JSON.stringify(user, null, 2));
-    return this.productService.getAllHideProducts();
+  async getAllHideProducts(@Res() res: Response) {
+    new SuccessResponse({
+      message: "List hide product OK",
+      metadata: await this.productService.getAllHideProducts(),
+    }).send(res);
   }
 
   @Public()
@@ -77,8 +83,11 @@ export class ProductController {
   }
 
   @Get("most-viewed")
-  mostViewed() {
-    return this.productService.mostViewed();
+  async mostViewed(@Res() res: Response) {
+    new SuccessResponse({
+      message: "List most view product OK",
+      metadata: await this.productService.mostViewed(),
+    }).send(res);
   }
 
   @Public()

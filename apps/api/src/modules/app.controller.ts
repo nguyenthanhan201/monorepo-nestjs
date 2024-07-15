@@ -9,8 +9,7 @@ export class AppController {
 
   @Public()
   @Get()
-  getHello(@Req() request: Request): string {
-    // console.log('👌  request:', request.cookies.token);
+  getHello(@Req() request: Request) {
     return "Hello World! deploy";
   }
 

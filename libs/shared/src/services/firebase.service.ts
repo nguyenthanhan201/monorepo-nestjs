@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import * as admin from 'firebase-admin';
+import { Injectable } from "@nestjs/common";
+import * as admin from "firebase-admin";
 import {
   firebaseCredential,
   firebaseStorageBucket,
-} from '../configs/firebaseCredential.config';
+} from "../configs/firebaseCredential.config";
 
 @Injectable()
 export class FirebaseService {
@@ -19,5 +19,9 @@ export class FirebaseService {
 
   getStorageInstance(): admin.storage.Storage {
     return this.storage;
+  }
+
+  auth() {
+    return admin.auth();
   }
 }
