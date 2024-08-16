@@ -11,7 +11,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   // @UseGuards(JwtAuthGuard)
-  @Get("getAllOrder/:key")
+  @Get("orders/:key")
   async getAllOrders(@Res() res: Response) {
     new SuccessResponse({
       message: "List order product OK",

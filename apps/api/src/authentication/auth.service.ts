@@ -14,7 +14,7 @@ import {
 import { EmailService } from "../modules/email/email.service";
 import { User } from "../modules/user/user.model";
 import { UserService } from "../modules/user/user.service";
-import { AuthLoginDto } from "./dto/authLogin.dto";
+import { AuthLoginDevDto, AuthLoginDto } from "./dto/authLogin.dto";
 
 @Injectable()
 export class AuthService {
@@ -85,6 +85,27 @@ export class AuthService {
           return res;
         });
     }
+
+    const payload = { ...user, refeshToken: "" };
+
+    const access_token = await this.generateToken(
+      payload,
+      JWT_ACCESS_TOKEN_EXPIRED
+    );
+    const refresh_token = await this.generateToken(
+      payload,
+      JWT_REFRESH_TOKEN_EXPIRED
+    );
+
+    return {
+      access_token,
+      refresh_token,
+      user,
+    };
+  }
+
+  async signInDev({ email }: AuthLoginDevDto) {
+    const user = await this.userService.findOne(email);
 
     const payload = { ...user, refeshToken: "" };
 

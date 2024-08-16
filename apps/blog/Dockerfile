@@ -17,7 +17,8 @@ COPY package*.json .
 # RUN npm cache clean --force && \
 #     npm install -g npm@8.13.2 && \
 #     npm install
-RUN npm ci --only=production
+# RUN npm ci --only=production
+RUN npm install 
 
 COPY . .
 

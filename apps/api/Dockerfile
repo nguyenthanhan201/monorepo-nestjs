@@ -1,27 +1,69 @@
-# FROM node
+##################
+# BUILD BASE IMAGE
+##################
 
-# WORKDIR /usr/src/app
+FROM node:20-alpine AS base
 
-# COPY package*.json .
+#############################
+# BUILD FOR LOCAL DEVELOPMENT
+#############################
 
-# RUN npm install
+FROM base As development
+WORKDIR /app
+RUN chown -R node:node /app
 
-# COPY . .
+COPY --chown=node:node package*.json ./
 
-FROM node:20-alpine
+# Install all dependencies (including devDependencies)
+RUN npm install
 
-WORKDIR /usr/src/app
+# Bundle app source
+COPY --chown=node:node . .
 
-COPY package*.json .
+# Use the node user from the image (instead of the root user)
+USER node
 
-# RUN npm cache clean --force && \
-#     npm install -g npm@8.13.2 && \
-#     npm install
-RUN npm ci --only=production
+#####################
+# BUILD BUILDER IMAGE
+#####################
 
-COPY . .
+FROM base AS builder
+WORKDIR /app
 
-# RUN npm run build:api
+COPY --chown=node:node package*.json ./
+COPY --chown=node:node --from=development /app/node_modules ./node_modules
+COPY --chown=node:node --from=development /app/apps/api/src ./apps/api/src
+COPY --chown=node:node --from=development /app/libs ./libs
+COPY --chown=node:node --from=development /app/tsconfig.json ./tsconfig.json
+COPY --chown=node:node --from=development /app/tsconfig.build.json ./tsconfig.build.json
+COPY --chown=node:node --from=development /app/apps/api/tsconfig.app.json ./apps/api/tsconfig.app.json
+COPY --chown=node:node --from=development /app/nest-cli.json ./nest-cli.json
 
-# CMD ["node", "dist/apps/api/apps/api/src/main.js"]
-CMD ["npm", "run", "dev:api"]
+RUN npm run build:api
+
+# Removes unnecessary packages adn re-install only production dependencies
+ENV NODE_ENV production
+# RUN pnpm prune --prod
+RUN npm install --prod
+  
+USER node
+
+######################
+# BUILD FOR PRODUCTION
+######################
+
+FROM node:20-alpine AS production
+WORKDIR /app
+
+RUN mkdir -p src/generated && chown -R node:node src
+
+# Copy the bundled code from the build stage to the production image
+# COPY --chown=node:node --from=builder /app/src/generated/i18n.generated.ts ./src/generated/i18n.generated.ts
+COPY --chown=node:node --from=builder /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/dist ./dist
+COPY --chown=node:node --from=builder /app/package.json ./
+
+USER node
+
+# Start the server using the production build
+CMD ["npm", "run", "start:api"]

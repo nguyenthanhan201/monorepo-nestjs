@@ -10,11 +10,11 @@ import {
   Request,
   Res,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiTags } from "@nestjs/swagger";
 import { Request as RequestExpress, Response } from "express";
 import { Public } from "../common/decorators/allow-unauthorize-request.decorator";
 import { AuthService } from "./auth.service";
-import { AuthLoginDto } from "./dto/authLogin.dto";
+import { AuthLoginDevDto, AuthLoginDto } from "./dto/authLogin.dto";
 import { RefreshTokenDto } from "./dto/refreshToken.dto";
 
 @ApiTags("Auth")
@@ -31,12 +31,21 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post("login")
-  @ApiOperation({ summary: "Login" })
   signIn(
-    @Body() body: AuthLoginDto,
-    @Res({ passthrough: true }) response: Response
+    @Body() body: AuthLoginDto
+    // @Res({ passthrough: true }) response: Response
   ) {
     return this.authService.signIn(body);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post("login-dev")
+  signInDev(
+    @Body() body: AuthLoginDevDto
+    // @Res({ passthrough: true }) response: Response
+  ) {
+    return this.authService.signInDev(body);
   }
 
   @Get("profile")

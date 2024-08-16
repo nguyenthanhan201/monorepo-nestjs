@@ -1,3 +1,5 @@
+import { BadRequestError } from "@app/shared/core/error.response";
+import { GenericFilter, PageService } from "@app/shared/services/page.service";
 import { HttpService } from "@nestjs/axios";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
@@ -10,14 +12,29 @@ import { ProductCreateDto } from "./dto/productCreate.dto";
 import { Product, ProductDocument } from "./product.model";
 
 @Injectable()
-export class ProductService {
+export class ProductService extends PageService {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private httpService: HttpService,
     private readonly productProducer: ProductProducer
-  ) {}
+  ) {
+    super();
+  }
+
+  async getProducts(filter: GenericFilter, key: string | undefined) {
+    const products = await this.getAllProducts(key);
+    const paginatedProducts = await this.paginateByMongoose(
+      this.productModel,
+      filter
+    );
+
+    return {
+      products,
+      paginatedProducts,
+    };
+  }
 
   async getAllSlugs(): Promise<string[]> {
     return await this.productModel
@@ -27,12 +44,7 @@ export class ProductService {
       .then((res) => res.map((item) => item.slug));
   }
 
-  async getAllProducts(key: string): Promise<ProductCreateDto[]> {
-    // products = await this.productProducer.cacheProductsToRedis(products);
-    // products = await this.cacheManager.get(key);
-
-    // if (key) await this.productProducer.cacheProductsToRedis(products);
-
+  async getAllProducts(key: string | undefined): Promise<ProductCreateDto[]> {
     const products = await this.productModel
       .find(
         {
@@ -52,17 +64,10 @@ export class ProductService {
       )
       .lean();
 
-    this.cacheManager.set(key, products, 60 * 60 * 24 * 7); // 7 days
+    if (key) {
+      this.cacheManager.set(key, products, 60 * 60 * 24 * 7); // 7 days
+    }
     return products;
-    // return this.httpService
-    //   .get('https://jsonplaceholder.typicode.com/todos')
-    //   .toPromise()
-    //   .then(async (res) => {
-    //     // await res.data.forEach(async (element) => {
-    //     //   await this.searchService.indexPost(element);
-    //     // });
-    //     return res.data;
-    //   });
   }
 
   async getAllHideProducts(): Promise<Product[]> {
@@ -109,9 +114,6 @@ export class ProductService {
     productData: ProductCreateDto,
     idProduct: string
   ): Promise<ProductCreateDto> {
-    const cacheKey = `rating:${idProduct}`;
-    await this.cacheManager.del(cacheKey);
-
     return await this.productModel
       .findOneAndUpdate({ _id: idProduct }, productData, { new: true })
       .then(
@@ -119,11 +121,8 @@ export class ProductService {
           return res;
         },
         (error) => {
-          console.log("Error update product:", error);
-          throw new HttpException(
-            "Failed to update product",
-            HttpStatus.INTERNAL_SERVER_ERROR
-          );
+          // console.log("Error update product:", error);
+          throw new BadRequestError(error.message);
         }
       );
   }

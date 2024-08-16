@@ -59,4 +59,26 @@ class CREATED extends SuccessResponse {
   }
 }
 
-export { CREATED, OK, SuccessResponse };
+class DELETED extends SuccessResponse {
+  constructor({ message, statusCode = HttpStatus.OK, metadata, options = {} }) {
+    super({
+      message,
+      statusCode,
+      metadata,
+      options,
+    });
+  }
+}
+
+class UPDATED extends SuccessResponse {
+  constructor({ message, statusCode = HttpStatus.OK, metadata, options = {} }) {
+    super({
+      message,
+      statusCode,
+      metadata,
+      options,
+    });
+  }
+}
+
+export { CREATED, DELETED, OK, SuccessResponse, UPDATED };

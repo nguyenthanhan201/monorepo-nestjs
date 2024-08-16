@@ -31,3 +31,7 @@ https://dashboard.render.com/
 # Cloudamqp
 
 https://gerbil.rmq.cloudamqp.com/#/queues
+
+# Freedomain
+
+https://freedomain.one/Direct.sv?cmd=userhome

@@ -1,12 +1,15 @@
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { ValidationPipe } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as compression from "compression";
-import { ThrottlerExceptionFilter } from "./common/filters";
+import { DeleteCacheInterceptor } from "./common/interceptors/deleteCache.interceptor";
 import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
 import { AppModule } from "./modules/app.module";
 
 const configSwagger = new DocumentBuilder()
+  .addBearerAuth()
   .setTitle("Admin test")
   .setDescription("The admin API description")
   .setVersion("1.0")
@@ -32,16 +35,25 @@ const optionsCompress = {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  const NODE_ENV = configService.get("NODE_ENV");
 
   // app.use('trust proxy', 1); // trust first proxy
 
   app.setGlobalPrefix("api/v1");
 
-  // app.enableCors({
-  //   origin: ["https://nginx-1-0-0.onrender.com", /localhost:\d{4}/],
-  //   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  //   credentials: true,
-  // });
+  app.enableCors({
+    origin: [
+      "https://demo-sigma-smoky.vercel.app",
+      "https://nginx-1-0-0.onrender.com",
+      // /localhost:\d{4}/,
+      "http://localhost:3002",
+    ],
+    // origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    credentials: true,
+  });
 
   // app.use(rateLimit(optionsRateLimit));
 
@@ -53,12 +65,19 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new LoggingInterceptor());
 
-  app.useGlobalFilters(new ThrottlerExceptionFilter());
+  app.useGlobalInterceptors(new DeleteCacheInterceptor(app.get(CACHE_MANAGER)));
 
-  const document = SwaggerModule.createDocument(app, configSwagger, {
-    ignoreGlobalPrefix: true,
-  });
-  SwaggerModule.setup("swagger", app, document);
+  // app.useGlobalInterceptors(new ResponseInterceptor());
+
+  // app.useGlobalFilters(new ThrottlerExceptionFilter());
+
+  if (NODE_ENV === "development") {
+    const document = SwaggerModule.createDocument(app, configSwagger, {
+      ignoreGlobalPrefix: false,
+    });
+
+    SwaggerModule.setup("swagger", app, document);
+  }
 
   await app.listen(8080, () => {
     console.log("👌 Service listening port 8080...");

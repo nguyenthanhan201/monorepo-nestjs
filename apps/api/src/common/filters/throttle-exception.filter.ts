@@ -3,8 +3,8 @@ import {
   Catch,
   ExceptionFilter,
   HttpStatus,
-} from '@nestjs/common';
-import { ThrottlerException } from '@nestjs/throttler';
+} from "@nestjs/common";
+import { ThrottlerException } from "@nestjs/throttler";
 
 type ThrottlerExceptionCustom = {
   response: string;

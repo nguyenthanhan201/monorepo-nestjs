@@ -12,7 +12,6 @@ export class CommentGetDto {
 
   @IsNotEmpty()
   @IsString()
-  @IsOptional()
   discuss_id: string;
 
   // @IsNotEmpty()

@@ -1,4 +1,5 @@
-import { SuccessResponse } from "@app/shared/core/success.response";
+import { CREATED, SuccessResponse } from "@app/shared/core/success.response";
+import { GenericFilter } from "@app/shared/services/page.service";
 import {
   Body,
   Controller,
@@ -7,11 +8,14 @@ import {
   Param,
   Post,
   Put,
+  Query,
+  Req,
   Res,
 } from "@nestjs/common";
 import { ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { Public } from "../../common/decorators/allow-unauthorize-request.decorator";
+import { getCacheKeyFromPath } from "../../common/utils/redis";
 import { ProductCreateDto } from "./dto/productCreate.dto";
 import { ProductService } from "./product.service";
 
@@ -21,18 +25,27 @@ export class ProductController {
   constructor(private productService: ProductService) {}
 
   @Public()
-  // @Get("getAllProducts/:key")
-  @Get("getAllProducts/:key")
+  @Get("")
   // @ApiOperation({ summary: "Search product in elastic search" })
   @ApiResponse({
     status: 200,
     description: "Search product in elastic search",
   })
-  @ApiResponse({ status: 403, description: "Forbidden." })
-  async getAllProducts(@Res() res: Response, @Param("key") key: string) {
+  async getProducts(
+    @Query() filter: GenericFilter,
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
+    const key = getCacheKeyFromPath(req.path);
+
+    const { paginatedProducts } = await this.productService.getProducts(
+      filter,
+      key
+    );
+
     new SuccessResponse({
       message: "List product OK",
-      metadata: await this.productService.getAllProducts(key),
+      metadata: paginatedProducts,
     }).send(res);
   }
 
@@ -54,27 +67,42 @@ export class ProductController {
 
   @Post("store")
   @ApiProperty()
-  createProduct(@Body() body: ProductCreateDto) {
-    return this.productService.createProduct(body);
+  createProduct(@Res() res: Response, @Body() body: ProductCreateDto) {
+    new CREATED({
+      message: "Create product OK",
+      metadata: this.productService.createProduct(body),
+    }).send(res);
   }
 
   @Put(":id")
-  @ApiProperty()
-  updateProductByIdProduct(
-    @Body() body: ProductCreateDto,
+  async updateProductByIdProduct(
+    @Res() res: Response,
+    @Body() body: any,
     @Param("id") id: string
   ) {
-    return this.productService.updateProductByIdProduct(body, id);
+    new SuccessResponse({
+      message: "Update product OK",
+      metadata: await this.productService.updateProductByIdProduct(body, id),
+    }).send(res);
   }
 
   @Put("hide/:id")
-  hideProductByIdProduct(@Param("id") id: string) {
-    return this.productService.hideProductByIdProduct(id);
+  async hideProductByIdProduct(@Res() res: Response, @Param("id") id: string) {
+    new SuccessResponse({
+      message: "Hide product OK",
+      metadata: await this.productService.mostViewed(),
+    }).send(res);
   }
 
   @Put("unhide/:id")
-  unhideProductByIdProduct(@Param("id") id: string) {
-    return this.productService.unhideProductByIdProduct(id);
+  async unhideProductByIdProduct(
+    @Res() res: Response,
+    @Param("id") id: string
+  ) {
+    new SuccessResponse({
+      message: "Unhide product OK",
+      metadata: await this.productService.mostViewed(),
+    }).send(res);
   }
 
   @Delete()
@@ -82,6 +110,7 @@ export class ProductController {
     return this.productService.unhideProductByIdProduct(id);
   }
 
+  @Public()
   @Get("most-viewed")
   async mostViewed(@Res() res: Response) {
     new SuccessResponse({
