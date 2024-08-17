@@ -42,3 +42,8 @@ hls/*
 
 # Environment
 .env
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
