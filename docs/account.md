@@ -35,3 +35,7 @@ https://gerbil.rmq.cloudamqp.com/#/queues
 # Freedomain
 
 https://freedomain.one/Direct.sv?cmd=userhome
+
+# Bonsai (Elaticsearch)
+
+https://app.bonsai.io/clusters
