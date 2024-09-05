@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -6,8 +7,8 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-@Entity()
-export class Blog {
+@Entity({ database: "postgres" })
+export class Blog extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 

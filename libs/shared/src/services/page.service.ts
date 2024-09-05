@@ -15,8 +15,8 @@ export class GenericFilter {
 
   @Transform(({ value }) => Number(value))
   @IsNumber({}, { message: ' "pageSize" attribute should be a number ' })
-  @Min(5, { message: ' "pageSize" attribute should be greater than 5' })
-  public pageSize: number = 5;
+  @Min(4, { message: ' "pageSize" attribute should be greater than 4' })
+  public pageSize: number = 4;
 
   @IsOptional()
   public orderBy?: string;

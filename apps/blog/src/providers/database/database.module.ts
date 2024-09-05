@@ -1,17 +1,26 @@
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Blog } from "../../modules/blog/blog.entity";
+import { getMetadataArgsStorage } from "typeorm";
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        type: "postgres",
-        url: configService.get<string>("POSTGRES_URI"),
-        entities: [Blog],
-        synchronize: true,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const entities = getMetadataArgsStorage()
+          .tables.map((tbl) => tbl.target as Function)
+          .filter((entity) =>
+            entity.toString().toLowerCase().includes("entity")
+          );
+
+        return {
+          type: "postgres",
+          url: configService.get<string>("POSTGRES_URI"),
+          entities,
+          synchronize: true,
+          maxQueryExecutionTime: 1000,
+        };
+      },
       inject: [ConfigService],
     }),
   ],

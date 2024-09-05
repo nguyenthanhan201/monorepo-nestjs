@@ -84,6 +84,7 @@ http://localhost:8080/swagger-json
 - [Clean Architecture With NestJS](https://github.dev/royib/clean-architecture-nestJS)
 - [Upload Public File từ cơ bản tới tối ưu với AWS SDK v3](https://viblo.asia/p/setup-boilerplate-cho-du-an-nestjs-phan-11-upload-public-file-tu-co-ban-toi-toi-uu-voi-aws-sdk-v3-va-ataws-sdklib-storage-aNj4vx3OL6r#_cai-dat-package--10)
 - [Env](./docs/env.md)
+- [Docker-slim]('./docs/docker-slim.md')
 
 ## Jenkins
 

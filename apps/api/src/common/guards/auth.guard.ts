@@ -21,10 +21,9 @@ export class AuthGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    if (this.isPublic) return true;
+    if (this.isPublic(context)) return true;
 
     const request = context.switchToHttp().getRequest();
-    console.log(request.headers.authorization);
     try {
       const token = this.extractTokenFromHeader(request);
       // console.log("👌  token:", token);
@@ -54,7 +53,7 @@ export class AuthGuard implements CanActivate {
     // return coreHelper.removeQuotes(token);
   }
 
-  private isPublic(context: ExecutionContext) {
+  private isPublic(context: ExecutionContext): boolean {
     return this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
