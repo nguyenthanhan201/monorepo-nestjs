@@ -18,17 +18,18 @@ class SuccessResponse {
 
   constructor({
     message = ReasonStatusCode.OK,
-    statusCode = StatusCode.OK,
+    statusCode = HttpStatus.OK,
     reasonStatusCode = ReasonStatusCode.OK,
     metadata = {},
     options = {},
   }) {
-    this.message = !message ? ReasonStatusCode.OK : message;
+    this.message = message ?? ReasonStatusCode.OK;
     this.statusCode = statusCode;
     this.metadata = metadata;
   }
 
   send(res: Response, header = {}) {
+    console.log("header", this.statusCode);
     return res.status(this.statusCode).json(this);
   }
 }
@@ -60,7 +61,12 @@ class CREATED extends SuccessResponse {
 }
 
 class DELETED extends SuccessResponse {
-  constructor({ message, statusCode = HttpStatus.OK, metadata, options = {} }) {
+  constructor({
+    message,
+    statusCode = HttpStatus.NO_CONTENT,
+    metadata,
+    options = {},
+  }) {
     super({
       message,
       statusCode,
@@ -71,7 +77,12 @@ class DELETED extends SuccessResponse {
 }
 
 class UPDATED extends SuccessResponse {
-  constructor({ message, statusCode = HttpStatus.OK, metadata, options = {} }) {
+  constructor({
+    message,
+    statusCode = HttpStatus.NO_CONTENT,
+    metadata,
+    options = {},
+  }) {
     super({
       message,
       statusCode,

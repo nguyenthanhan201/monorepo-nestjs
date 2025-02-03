@@ -2,6 +2,7 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import {
   CallHandler,
   ExecutionContext,
+  HttpStatus,
   Inject,
   Injectable,
   NestInterceptor,
@@ -9,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { Observable } from "rxjs";
-import { cacheModules } from "../constants/cacheModules";
+import { routesWithRedisMiddleware } from "../constants/getRedisCacheRouters";
 import { getCacheKeyFromPath } from "../utils/redis";
 
 @Injectable()
@@ -31,13 +32,18 @@ export class DeleteCacheInterceptor implements NestInterceptor {
 
     const httpContext = context.switchToHttp();
     const response = httpContext.getResponse();
+    // console.log("👌  response:", response);
     const request = httpContext.getRequest();
     const statusCode = response.statusCode;
     const path = request.url;
 
     const cacheKey = getCacheKeyFromPath(path);
 
-    if (statusCode === 200) {
+    if (
+      statusCode === HttpStatus.CREATED ||
+      statusCode === HttpStatus.NO_CONTENT
+    ) {
+      console.log("delete cache");
       await this.cacheManager.del(cacheKey);
     }
 
@@ -49,10 +55,14 @@ export class DeleteCacheInterceptor implements NestInterceptor {
     const path = request.url;
 
     const cacheKey = getCacheKeyFromPath(path);
+    console.log("👌  cacheKey:", cacheKey);
+    const redisCacheRouters = routesWithRedisMiddleware.map(
+      (router) => router.path
+    );
 
     return (
       this.allowedMethods.includes(request.method) &&
-      cacheModules.includes(cacheKey)
+      redisCacheRouters.includes(cacheKey)
     );
   }
 }

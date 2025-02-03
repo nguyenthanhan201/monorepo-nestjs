@@ -25,14 +25,15 @@ export class ProductService extends PageService {
 
   async getProducts(filter: GenericFilter, key: string | undefined) {
     const products = await this.getAllProducts(key);
-    const paginatedProducts = await this.paginateByMongoose(
-      this.productModel,
-      filter
-    );
+    // console.log("👌  products:", products);
+    // const paginatedProducts = await this.paginateByMongoose(
+    //   this.productModel,
+    //   filter
+    // );
 
     return {
       products,
-      paginatedProducts,
+      // paginatedProducts,
     };
   }
 
@@ -62,20 +63,24 @@ export class ProductService extends PageService {
         //   limit: 10,
         // },
       )
-      .lean();
+      .lean(); // use lean() to return plain JS object instead of Mongoose document
 
     if (key) {
-      this.cacheManager.set(key, products, 60 * 60 * 24 * 7); // 7 days
+      await this.cacheManager.set(key, products, 60 * 60 * 24 * 7); // 7 days
     }
     return products;
   }
 
   async getAllHideProducts(): Promise<Product[]> {
-    return await this.productModel
+    const hideProducts = await this.productModel
       .find({
         deletedAt: { $ne: null },
       })
       .lean();
+
+    // await this.cacheManager.set(key, hideProducts, 60 * 60 * 24 * 7); // 7 days
+
+    return hideProducts;
   }
 
   async isSlugExists(slug: string): Promise<boolean> {
@@ -128,6 +133,7 @@ export class ProductService extends PageService {
   }
 
   async hideProductByIdProduct(idProduct: string): Promise<ProductCreateDto> {
+    console.log("👌  idProduct:", idProduct);
     return await this.productModel
       .findOneAndUpdate(
         { _id: idProduct },

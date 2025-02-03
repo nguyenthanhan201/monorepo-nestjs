@@ -5,7 +5,6 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, NestMiddleware } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { NextFunction, Request, Response } from "express";
-import { paginate } from "../utils";
 import { getCacheKeyFromPath } from "../utils/redis";
 
 @Injectable()
@@ -28,23 +27,23 @@ export class RedisMiddleware implements NestMiddleware {
       const cacheRedis: Array<any> = await this.cacheManager.get(key);
 
       if (cacheRedis) {
-        const pageCache = paginate({
-          page,
-          pageSize,
-          data: cacheRedis,
-        });
+        // const pageCache = paginate({
+        //   page,
+        //   pageSize,
+        //   data: cacheRedis,
+        // });
 
-        const result = {
-          data: pageCache,
-          total: cacheRedis.length,
-          page,
-          pageSize,
-          totalPages: Math.ceil(cacheRedis.length / pageSize),
-        };
+        // const result = {
+        //   data: cacheRedis,
+        //   total: cacheRedis.length,
+        //   page,
+        //   pageSize,
+        //   totalPages: Math.ceil(cacheRedis.length / pageSize),
+        // };
 
         return new SuccessResponse({
           message,
-          metadata: result,
+          metadata: cacheRedis,
         }).send(res);
       } else {
         next();

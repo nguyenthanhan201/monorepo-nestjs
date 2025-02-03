@@ -5,10 +5,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import * as Joi from "joi";
 import { AuthModule } from "../authentication/auth.module";
-import { routesWithRedisMiddleware } from "../common/constants/getRedisCacheRouters";
 import { AuthGuard } from "../common/guards/auth.guard";
 import { LogResponseMiddleware } from "../common/middlewares/logResponse.middleware";
-import { RedisMiddleware } from "../common/middlewares/redis.middleware";
 import {
   DatabaseModule,
   GlobalHttpModule,
@@ -26,6 +24,8 @@ import { ProductModule } from "./product/product.module";
 import { RatingModule } from "./rating/rating.module";
 import { ScrapperModule } from "./scrapper/scrapper.module";
 // import { TrancoderModule } from "./trancoder/trancoder.module";
+import { routesWithRedisMiddleware } from "../common/constants/getRedisCacheRouters";
+import { RedisMiddleware } from "../common/middlewares/redis.middleware";
 import { BrandModule } from "./brand/brand.module";
 import { CommentModule } from "./commnet/comment.module";
 import { UploadModule } from "./upload/upload.module";

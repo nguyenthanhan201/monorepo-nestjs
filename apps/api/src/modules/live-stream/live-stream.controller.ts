@@ -15,10 +15,10 @@ export class LiveStreamController {
 
   @HttpCode(HttpStatus.OK)
   @Get("")
-  getRoomByUserId(@Res() res: Response, @GetUser() userInfo: User) {
+  async getRoomByUserId(@Res() res: Response, @GetUser() userInfo: User) {
     new SuccessResponse({
       message: "Get room by user id OK",
-      metadata: this.liveStreamService.getLiveStreamByUserId(
+      metadata: await this.liveStreamService.getLiveStreamByUserId(
         convertToObjectIdMongodb(userInfo._id)
       ),
     }).send(res);
@@ -27,10 +27,10 @@ export class LiveStreamController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Get("all")
-  getAllRooms(@Res() res: Response) {
+  async getAllRooms(@Res() res: Response) {
     new SuccessResponse({
       message: "Get all rooms OK",
-      metadata: this.liveStreamService.getAllRooms(),
+      metadata: await this.liveStreamService.getAllRooms(),
     }).send(res);
   }
 }

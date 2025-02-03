@@ -9,7 +9,18 @@ import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
 import { AppModule } from "./modules/app.module";
 
 const configSwagger = new DocumentBuilder()
-  .addBearerAuth()
+  .addBearerAuth(
+    {
+      type: "http",
+      scheme: "bearer",
+      bearerFormat: "JWT",
+      in: "header",
+      name: "Authorization",
+      description: "Enter your Bearer token",
+    },
+    "bearer"
+  )
+  .addSecurityRequirements("bearer")
   .setTitle("Admin test")
   .setDescription("The admin API description")
   .setVersion("1.0")
@@ -34,7 +45,9 @@ const optionsCompress = {
 // };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ["error", "warn", "log"],
+  });
   const configService = app.get(ConfigService);
 
   const NODE_ENV = configService.get("NODE_ENV");
@@ -76,7 +89,12 @@ async function bootstrap() {
       ignoreGlobalPrefix: false,
     });
 
-    SwaggerModule.setup("swagger", app, document);
+    SwaggerModule.setup("docs", app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        tryItOutEnabled: true,
+      },
+    });
   }
 
   await app.listen(8080, () => {

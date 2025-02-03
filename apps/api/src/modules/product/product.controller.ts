@@ -1,10 +1,16 @@
-import { CREATED, SuccessResponse } from "@app/shared/core/success.response";
+import {
+  CREATED,
+  DELETED,
+  SuccessResponse,
+  UPDATED,
+} from "@app/shared/core/success.response";
 import { GenericFilter } from "@app/shared/services/page.service";
 import {
   Body,
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -38,14 +44,12 @@ export class ProductController {
   ) {
     const key = getCacheKeyFromPath(req.path);
 
-    const { paginatedProducts } = await this.productService.getProducts(
-      filter,
-      key
-    );
+    const { products } = await this.productService.getProducts(filter, key);
 
     new SuccessResponse({
+      statusCode: HttpStatus.CREATED,
       message: "List product OK",
-      metadata: paginatedProducts,
+      metadata: products,
     }).send(res);
   }
 
@@ -80,7 +84,7 @@ export class ProductController {
     @Body() body: any,
     @Param("id") id: string
   ) {
-    new SuccessResponse({
+    new UPDATED({
       message: "Update product OK",
       metadata: await this.productService.updateProductByIdProduct(body, id),
     }).send(res);
@@ -88,9 +92,9 @@ export class ProductController {
 
   @Put("hide/:id")
   async hideProductByIdProduct(@Res() res: Response, @Param("id") id: string) {
-    new SuccessResponse({
+    new UPDATED({
       message: "Hide product OK",
-      metadata: await this.productService.mostViewed(),
+      metadata: await this.productService.hideProductByIdProduct(id),
     }).send(res);
   }
 
@@ -99,15 +103,18 @@ export class ProductController {
     @Res() res: Response,
     @Param("id") id: string
   ) {
-    new SuccessResponse({
+    new UPDATED({
       message: "Unhide product OK",
-      metadata: await this.productService.mostViewed(),
+      metadata: await this.productService.unhideProductByIdProduct(id),
     }).send(res);
   }
 
   @Delete()
   deleteProductByIdProduct(@Param("id") id: string) {
-    return this.productService.unhideProductByIdProduct(id);
+    new DELETED({
+      message: "Delete product OK",
+      metadata: this.productService.deleteProductByIdProduct(id),
+    });
   }
 
   @Public()
