@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { CartItem, CartItemDocument } from "./cart-item.model";
 import { CartItemCreateDto } from "./dto/CartItemCreate.dto";
 import { CartItemDeleteDto } from "./dto/CartItemDelete.dto";
@@ -12,7 +12,7 @@ export class CartItemService {
     private readonly cartItemModel: Model<CartItemDocument>
   ) {}
 
-  async getCartItemsByIdAuth(idAuth: string): Promise<any> {
+  async getCartItemsByIdAuth(idAuth: Types.ObjectId): Promise<any> {
     const cartItems = await this.cartItemModel
       .find({ idAuth })
       .populate("idProduct")
@@ -48,7 +48,7 @@ export class CartItemService {
 
   async delete(body: CartItemDeleteDto) {
     const { color, idAuth, idProduct, size } = body;
-    console.log("👌  idAuth:", color, idAuth, idProduct, size);
+    // console.log("👌  idAuth:", color, idAuth, idProduct, size);
 
     return this.cartItemModel.deleteMany({
       idAuth,

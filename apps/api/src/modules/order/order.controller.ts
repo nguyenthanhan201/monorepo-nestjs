@@ -1,7 +1,9 @@
 import { SuccessResponse } from "@app/shared/core/success.response";
-import { Body, Controller, Get, Param, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { Request, Response } from "express";
+import { GetUser } from "../../common/decorators/get-user.decorator";
+import { User } from "../user/user.model";
 import { OrderCreatePaymentDto } from "./dto/OrderCreatePayment.dto";
 import { OrderService } from "./order.service";
 
@@ -11,7 +13,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   // @UseGuards(JwtAuthGuard)
-  @Get("orders/:key")
+  @Get("")
   async getAllOrders(@Res() res: Response) {
     new SuccessResponse({
       message: "List order product OK",
@@ -19,9 +21,9 @@ export class OrderController {
     }).send(res);
   }
 
-  @Get("show/:id")
-  getOrdersByIdAuth(@Param("id") idAuth: string) {
-    return this.orderService.getOrdersByIdAuth(idAuth);
+  @Get("show")
+  getOrdersByIdAuth(@GetUser() userInfo: User) {
+    return this.orderService.getOrdersByIdAuth(userInfo._id);
   }
 
   @Post("payment-url")
@@ -35,7 +37,11 @@ export class OrderController {
   }
 
   @Post("add-order")
-  addOrder(@Req() req: Request, @Res() res: Response) {
-    return this.orderService.addOrder(req, res);
+  addOrder(
+    @Req() req: Request,
+    @Res() res: Response,
+    @GetUser() userInfo: User
+  ) {
+    return this.orderService.addOrder(req, res, userInfo._id);
   }
 }

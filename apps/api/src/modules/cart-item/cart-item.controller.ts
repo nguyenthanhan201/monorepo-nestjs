@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { GetUser } from "../../common/decorators/get-user.decorator";
+import { User } from "../user/user.model";
 import { CartItemService } from "./cart-item.service";
 import { CartItemCreateDto } from "./dto/CartItemCreate.dto";
 import { CartItemDeleteDto } from "./dto/CartItemDelete.dto";
@@ -9,9 +11,9 @@ import { CartItemDeleteDto } from "./dto/CartItemDelete.dto";
 export class CartItemController {
   constructor(private readonly cartItemService: CartItemService) {}
 
-  @Get(":id")
-  getCartItemsByIdAuth(@Param("id") idAuth: string) {
-    return this.cartItemService.getCartItemsByIdAuth(idAuth);
+  @Get()
+  async getCartItemsByIdAuth(@GetUser() userInfo: User) {
+    return this.cartItemService.getCartItemsByIdAuth(userInfo._id);
   }
 
   @Post("create")

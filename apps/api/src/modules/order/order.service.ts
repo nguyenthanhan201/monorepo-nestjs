@@ -4,8 +4,9 @@ import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
 import * as CryptoJS from "crypto-js";
 import * as dateFormat from "date-format";
+import { Request, Response } from "express";
 import * as ip from "ip";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import configVNPay from "../../config/configVNPay";
 import { CartItem, CartItemDocument } from "../cart-item/cart-item.model";
 import { Product, ProductDocument } from "../product/product.model";
@@ -57,7 +58,7 @@ export class OrderService {
     return this.orderModel.find().sort({ createdAt: -1 });
   }
 
-  async getOrdersByIdAuth(idAuth: string) {
+  async getOrdersByIdAuth(idAuth: Types.ObjectId) {
     // get orders have idAuth = id and sort by date
     return this.orderModel
       .find({ idAuth })
@@ -154,9 +155,7 @@ export class OrderService {
     }
   }
 
-  async addOrder(req, res) {
-    const { idAuth } = req.body;
-
+  async addOrder(req: Request, res: Response, idAuth: Types.ObjectId) {
     // tìm cartItem của user
     return this.cartItemModel
       .find({

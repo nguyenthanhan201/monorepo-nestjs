@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cache } from "cache-manager";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { Rating, RatingDocument } from "./rating.model";
 
 @Injectable()
@@ -13,7 +13,7 @@ export class RatingService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
-  async getRatingByIdAuth(idAuth: string): Promise<any> {
+  async getRatingByIdAuth(idAuth: Types.ObjectId) {
     return this.ratingModel.find({ idAuth }).populate("idProduct").exec();
   }
 

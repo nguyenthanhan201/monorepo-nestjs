@@ -16,7 +16,7 @@ export class BrandService {
   ) {}
 
   getAllBrandsByUserId(userId: Types.ObjectId) {
-    console.log("👌  userId:", userId);
+    // console.log("👌  userId:", userId);
     return this.brandModal.find({ createdByUserId: userId });
   }
 

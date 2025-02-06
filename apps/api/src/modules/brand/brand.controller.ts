@@ -44,9 +44,7 @@ export class BrandController {
 
   @Get("getBrandsByUserId")
   getAllBrandsByUserId(@GetUser() userInfo: User) {
-    return this.brandService.getAllBrandsByUserId(
-      convertToObjectIdMongodb(userInfo._id)
-    );
+    return this.brandService.getAllBrandsByUserId(userInfo._id);
   }
 
   @Post("create")
