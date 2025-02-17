@@ -20,11 +20,13 @@ export class BrandService {
     return this.brandModal.find({ createdByUserId: userId });
   }
 
-  createBrand(data: BrandCreateDto) {
+  async createBrand(data: BrandCreateDto) {
     try {
-      const isUserExist = this.brandModal.findOne({
-        createdByUserId: data.createdByUserId,
-      });
+      const isUserExist = await this.brandModal
+        .findOne({
+          createdByUserId: data.createdByUserId,
+        })
+        .exec();
 
       if (isUserExist) {
         throw new BadRequestError("User already created brand");
@@ -39,7 +41,7 @@ export class BrandService {
     }
   }
 
-  updateDesign(brandId: Types.ObjectId, design: string, preview: string) {
+  async updateDesign(brandId: Types.ObjectId, design: string, preview: string) {
     return this.brandModal.updateOne(
       { _id: brandId },
       { design, preview },
